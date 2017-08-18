@@ -1,0 +1,233 @@
+{
+    "name":"Plan",
+    "text":"",
+    "children":
+    [
+       {
+       "name":"Project",
+       "text":"Project [uid# booking_ticket_id#L airport_origin# airport_destination# date_departure_planned# operating_carrier_code#]",
+       "children":
+       [
+          {
+          "name":"SortMergeJoin",
+          "text":"SortMergeJoin [booking_ticket_id#L] [booking_ticket_id#L] Inner"
+          },
+          {
+          "name":"Sort",
+          "text":"Sort [booking_ticket_id#L ASC] false",
+          "children":
+          [
+             {
+             "name":"Exchange",
+             "text":"Exchange hashpartitioning(booking_ticket_id#L )",
+             "children":
+             [
+                {
+                "name":"Project",
+                "text":"Project [uid# AIRPORT_ORIGIN# AIRPORT_DESTINATION# date_departure_planned# operating_carrier_code# booking_ticket_id#L]",
+                "children":
+                [
+                   {
+                   "name":"Filter",
+                   "text":"Filter isnotnull(booking_ticket_id#L)",
+                   "children":
+                   [
+                      {
+                      "name":"Scan",
+                      "text":"Scan csv [booking_ticket_id#LAIRPORT_DESTINATION#AIRPORT_ORIGIN#OPERATING_CARRIER_CODE#DATE_DEPARTURE_PLANNED#UID#] Format CSV InputPaths hdfsnameservicedataabfcacbmodelstage_ticket_old PartitionFilters [] PushedFilters [IsNotNull(booking_ticket_id)] ReadSchema struct<booking_ticket_idbigintAIRPORT_DESTINATIONstringAIRPORT_ORIGINstringOPERATING_CARRIE"
+                      }
+                   ]
+    
+                   }
+                ]
+    
+                }
+             ]
+    
+             }
+          ]
+    
+          },
+          {
+          "name":"Project",
+          "text":"Project [booking_ticket_id#L]",
+          "children":
+          [
+             {
+             "name":"Filter",
+             "text":"Filter (isnotnull(rn#) && (rn# = ))",
+             "children":
+             [
+                {
+                "name":"Window",
+                "text":"Window [rownumber() windowspecdefinition(booking_ticket_id#L DATE_DEPARTURE_PLANNED# ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS rn#] [booking_ticket_id#L] [DATE_DEPARTURE_PLANNED# ASC]",
+                "children":
+                [
+                   {
+                   "name":"Sort",
+                   "text":"Sort [booking_ticket_id#L ASC DATE_DEPARTURE_PLANNED# ASC] false"
+                   },
+                   {
+                   "name":"Project",
+                   "text":"Project [booking_ticket_id#L DATE_DEPARTURE_PLANNED#]",
+                   "children":
+                   [
+                      {
+                      "name":"SortMergeJoin",
+                      "text":"SortMergeJoin [booking_ticket_id#L] [booking_ticket_id#L] Inner",
+                      "children":
+                      [
+                         {
+                         "name":"Sort",
+                         "text":"Sort [booking_ticket_id#L ASC] false",
+                         "children":
+                         [
+                            {
+                            "name":"Exchange",
+                            "text":"Exchange hashpartitioning(booking_ticket_id#L )",
+                            "children":
+                            [
+                               {
+                               "name":"Project",
+                               "text":"Project [DATE_DEPARTURE_PLANNED# booking_ticket_id#L]",
+                               "children":
+                               [
+                                  {
+                                  "name":"Filter",
+                                  "text":"Filter isnotnull(booking_ticket_id#L)",
+                                  "children":
+                                  [
+                                     {
+                                     "name":"Scan",
+                                     "text":"Scan csv [booking_ticket_id#LDATE_DEPARTURE_PLANNED#] Format CSV InputPaths hdfsnameservicedataabfcacbmodelstage_ticket_old PartitionFilters [] PushedFilters [IsNotNull(booking_ticket_id)] ReadSchema struct<booking_ticket_idbigintDATE_DEPARTURE_PLANNEDtimestamp>"
+                                     }
+                                  ]
+    
+                                  }
+                               ]
+    
+                               }
+                            ]
+    
+                            }
+                         ]
+    
+                         },
+                         {
+                         "name":"Project",
+                         "text":"Project [booking_ticket_id#L]",
+                         "children":
+                         [
+                            {
+                            "name":"Filter",
+                            "text":"Filter ((isnotnull(min(OPERATING_CARRIER_CODE#)#) && (count(distinct OPERATING_CARRIER_CODE#)#L = )) && (min(OPERATING_CARRIER_CODE#)# = S))"
+                            },
+                            {
+                            "name":"SortAggregate",
+                            "text":"SortAggregate(key=[booking_ticket_id#L] functions=[min(OPERATING_CARRIER_CODE#)count(distinct OPERATING_CARRIER_CODE#)])",
+                            "children":
+                            [
+                               {
+                               "name":"Sort",
+                               "text":"Sort [booking_ticket_id#L ASC] false",
+                               "children":
+                               [
+                                  {
+                                  "name":"Exchange",
+                                  "text":"Exchange hashpartitioning(booking_ticket_id#L )",
+                                  "children":
+                                  [
+                                     {
+                                     "name":"SortAggregate",
+                                     "text":"SortAggregate(key=[booking_ticket_id#L] functions=[merge_min(OPERATING_CARRIER_CODE#)partial_count(distinct OPERATING_CARRIER_CODE#)])"
+                                     },
+                                     {
+                                     "name":"SortAggregate",
+                                     "text":"SortAggregate(key=[booking_ticket_id#LOPERATING_CARRIER_CODE#] functions=[merge_min(OPERATING_CARRIER_CODE#)])",
+                                     "children":
+                                     [
+                                        {
+                                        "name":"Sort",
+                                        "text":"Sort [booking_ticket_id#L ASC OPERATING_CARRIER_CODE# ASC] false",
+                                        "children":
+                                        [
+                                           {
+                                           "name":"Exchange",
+                                           "text":"Exchange hashpartitioning(booking_ticket_id#L OPERATING_CARRIER_CODE# )",
+                                           "children":
+                                           [
+                                              {
+                                              "name":"SortAggregate",
+                                              "text":"SortAggregate(key=[booking_ticket_id#LOPERATING_CARRIER_CODE#] functions=[partial_min(OPERATING_CARRIER_CODE#)])"
+                                              },
+                                              {
+                                              "name":"Sort",
+                                              "text":"Sort [booking_ticket_id#L ASC OPERATING_CARRIER_CODE# ASC] false",
+                                              "children":
+                                              [
+                                                 {
+                                                 "name":"Project",
+                                                 "text":"Project [OPERATING_CARRIER_CODE# booking_ticket_id#L]",
+                                                 "children":
+                                                 [
+                                                    {
+                                                    "name":"Filter",
+                                                    "text":"Filter isnotnull(booking_ticket_id#L)",
+                                                    "children":
+                                                    [
+                                                       {
+                                                       "name":"Scan",
+                                                       "text":"Scan csv [booking_ticket_id#LOPERATING_CARRIER_CODE#] Format CSV InputPaths hdfsnameservicedataabfcacbmodelstage_ticket_old PartitionFilters [] PushedFilters [IsNotNull(booking_ticket_id)] ReadSchema struct<booking_ticket_idbigintOPERATING_CARRIER_CODEstring>"
+                                                       }
+                                                    ]
+    
+                                                    }
+                                                 ]
+    
+                                                 }
+                                              ]
+    
+                                              }
+                                           ]
+    
+                                           }
+                                        ]
+    
+                                        }
+                                     ]
+    
+                                     }
+                                  ]
+    
+                                  }
+                               ]
+    
+                               }
+                            ]
+    
+                            }
+                         ]
+    
+                         }
+                      ]
+    
+                      }
+                   ]
+    
+                   }
+                ]
+    
+                }
+             ]
+    
+             }
+          ]
+    
+          }
+       ]
+    
+       }
+    ]
+    
+    }
+    
